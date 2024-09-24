@@ -62,14 +62,16 @@ export default {
         });
 
         const userType = response.data.user.user_type;
+        localStorage.setItem('userType', userType);
+
 
         // Redirect based on user type
         if (userType === 'admin') {
           this.$router.push('/admin');
         } else if (userType === 'patient') {
-          this.$router.push('/patient');
+          this.$router.push('/patient-dash');
         } else if (userType === 'doctor') {
-          this.$router.push('/doctor');
+          this.$router.push('/doctor-dash');
         }
       } catch (error) {
         if (error.response && error.response.data.errors) {

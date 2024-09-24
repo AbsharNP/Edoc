@@ -44,17 +44,27 @@ const routes = [
     name: 'admin',
     component: () =>
       import(
-        /* webpackChunkName: "home" */ './components/views/pages/admin/adminHome.vue'
+        /* webpackChunkName: "adminhome" */ './components/views/pages/admin/adminHome.vue'
       ),
     meta: { layout: "app" },
   },
 
   {
-    path: '/doctor',
-    name: 'doctor',
+    path: '/doctor-view',
+    name: 'doctor-view',
     component: () =>
       import(
-        /* webpackChunkName: "home" */ './components/views/pages/doctor/docHome.vue'
+        /* webpackChunkName: "adminhome" */ './components/views/pages/admin/doctors.vue'
+      ),
+    meta: { layout: "app" },
+  },
+
+  {
+    path: '/doctor-dash',
+    name: 'doctor-dash',
+    component: () =>
+      import(
+        /* webpackChunkName: "dochome" */ './components/views/pages/doctor/docHome.vue'
       ),
     meta: { layout: "app" },
   },
@@ -64,7 +74,7 @@ const routes = [
     name: 'patient',
     component: () =>
       import(
-        /* webpackChunkName: "home" */ './components/views/pages/patient/patientHome.vue'
+        /* webpackChunkName: "patienthome" */ './components/views/pages/patient/patientHome.vue'
       ),
     meta: { layout: "app" },
   },

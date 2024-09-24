@@ -3,7 +3,12 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
       <div class="container">
-        <a class="navbar-brand" href="#">Start Bootstrap</a>
+        <ul class="nav-list">
+          <li v-if="userType === 'admin'">Admin Dashboard</li>
+          <li v-if="userType === 'patient'">Patient Dashboard</li>
+          <li v-if="userType === 'doctor'">Doctor Dashboard</li>
+         
+        </ul>
         <button
           class="navbar-toggler"
           type="button"
@@ -42,13 +47,29 @@
 
 </style>
 
-
-
 <script>
-export default{
-    name: 'NavBar',
+export default {
+  name: 'NavBar',
+  data() {
+    return {
+      userType: null, // Initialize userType
+    };
+  },
+  mounted() {
+    // Get userType from localStorage when the component is mounted
+    this.userType = localStorage.getItem('userType');
+  },
+};
+</script>
+<style scoped>
+.nav-list {
+  list-style-type: none; /* Remove bullet points */
+  padding: 0; /* Remove default padding */
+  margin: 0; /* Remove default margin */
 }
 
-</script>
-
+.nav-list li {
+  padding: 8px 0; /* Add padding to list items if needed */
+}
+</style>
 
