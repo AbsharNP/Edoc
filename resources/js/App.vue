@@ -12,6 +12,7 @@
   <script>
   import AuthLayout from './components/Layouts/authLayout.vue';
   import AppLayout from './components/Layouts/appLayout.vue';
+  
 
 
   

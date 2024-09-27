@@ -12,7 +12,7 @@ const routes = [
 
   {
     path: '/login',
-    name: 'login-page',
+    name: 'login',
     component: () =>
       import(
         /* webpackChunkName: "login" */ './components/views/pages/auth/login.vue'
@@ -58,6 +58,38 @@ const routes = [
       ),
     meta: { layout: "app" },
   },
+
+  {
+    path: '/add-doctor',
+    name: 'add-Doctor',
+    component: () =>
+      import(
+        /* webpackChunkName: "adminhome" */ './components/views/pages/admin/addDoctor.vue'
+      ),
+    meta: { layout: "auth" },
+  },
+
+  {
+    path: '/department',
+    name: 'deparment',
+    component: () =>
+      import(
+        /* webpackChunkName: "adminhome" */ './components/views/pages/admin/departments.vue'
+      ),
+    meta: { layout: "app" },
+  },
+
+  {
+    path: '/schedule',
+    name: 'schedule',
+    component: () =>
+      import(
+        /* webpackChunkName: "adminhome" */ './components/views/pages/admin/schedule.vue'
+      ),
+    meta: { layout: "app" },
+  },
+
+
 
   {
     path: '/doctor-dash',
