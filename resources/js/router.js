@@ -90,7 +90,7 @@ const routes = [
   },
 
 
-
+  //doctor
   {
     path: '/doctor-dash',
     name: 'doctor-dash',
@@ -101,15 +101,37 @@ const routes = [
     meta: { layout: "app" },
   },
 
+  //patients
+
   {
-    path: '/patient',
-    name: 'patient',
+    path: '/patient-dash',
+    name: 'patient-dash',
     component: () =>
       import(
         /* webpackChunkName: "patienthome" */ './components/views/pages/patient/patientHome.vue'
       ),
     meta: { layout: "app" },
   },
+  {
+    path: '/doc-list',
+    name: 'doc-list',
+    component: () =>
+      import(
+        /* webpackChunkName: "patienthome" */ './components/views/pages/patient/p_doctors.vue'
+      ),
+    meta: { layout: "app" },
+  },
+  {
+    path: '/appointment',
+    name: 'appointment',
+    component: () =>
+      import(
+        /* webpackChunkName: "patienthome" */ './components/views/pages/patient/p_appointment.vue'
+      ),
+    meta: { layout: "auth" },
+  },
+
+  
   
 ];
 
