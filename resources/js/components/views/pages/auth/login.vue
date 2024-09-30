@@ -62,7 +62,11 @@ export default {
         });
 
         const userType = response.data.user.user_type;
+        const userName = response.data.user.name;
+        const userEmail = response.data.user.email;
         localStorage.setItem('userType', userType);
+        localStorage.setItem('userName', userName);
+        localStorage.setItem('userEmail', userEmail);
 
 
         // Redirect based on user type
