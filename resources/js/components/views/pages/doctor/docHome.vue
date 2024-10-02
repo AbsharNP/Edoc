@@ -1,8 +1,5 @@
 <template>
   <div>
-    <!-- Navbar (Assumed to be at the top) -->
-    
-
     <div class="d-flex">
       <!-- Sidebar -->
       <div class="sidebar bg-light vh-100 p-0">
@@ -10,13 +7,13 @@
       </div>
 
       <!-- Main Content -->
-      <div class="container ">
+      <div class="container">
         <!-- Header Section -->
         <div class="card p-4 mb-4 shadow-sm">
           <div class="d-flex justify-content-between align-items-center">
             <div>
               <h1 class="h4">Welcome!</h1>
-              <h2 class="h2">Test Doctor</h2>
+              <h2 class="h2">Dr. {{ capitalizedUserName }}</h2>
               <p class="text-muted">
                 Thanks for joining with us. We are always trying to get you a complete service.
                 You can view your daily schedule, Reach Patients Appointment at home!
@@ -25,12 +22,10 @@
                 View My Appointments
               </button>
             </div>
-            <!-- <div class="background-container" style="background-image: url('/images/calenderDH.png'); background-size: 250%; background-position: center;"> -->
-              <div class="text-center date-container" style="width: 200px; ">
-                <p class="mb-0 text-muted">Today's Date</p>
-                <h3 class="date-display">{{ todayDate }}</h3>
-              </div>
-            <!-- </div> -->
+            <div class="text-center date-container" style="width: 200px;">
+              <p class="mb-0 text-muted">Today's Date</p>
+              <h3 class="date-display">{{ todayDate }}</h3>
+            </div>
           </div>
         </div>
 
@@ -50,23 +45,27 @@
           <table class="table table-hover mt-3">
             <thead class="table-light">
               <tr>
-                <th scope="col">Session Title</th>
+                <th scope="col">SI No.</th>
                 <th scope="col">Scheduled Date</th>
-                <th scope="col">Time</th>
+                <th scope="col">Start Time</th>
+                <th scope="col">End Time</th>
+                <th scope="col">No. of Sessions</th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="sessions.length === 0">
-                <td colspan="3" class="text-center">
+                <td colspan="5" class="text-center">
                   <div class="d-flex justify-content-center align-items-center flex-column">
                     <p class="mt-3 text-muted">We couldn't find anything related to your schedule</p>
                   </div>
                 </td>
               </tr>
               <tr v-else v-for="(session, index) in sessions" :key="index">
-                <td>{{ session.title }}</td>
-                <td>{{ session.date }}</td>
-                <td>{{ session.time }}</td>
+                <td>{{ index + 1 }}</td>
+                <td>{{ session.s_date }}</td>
+                <td>{{ session.start_time }}</td>
+                <td>{{ session.end_time }}</td>
+                <td>{{ session.no_of_sessions }}</td>
               </tr>
             </tbody>
           </table>
@@ -78,6 +77,7 @@
 
 <script>
 import DocSidebar from '../../../layoutComponents/docSidebar.vue';
+import axios from 'axios';
 
 export default {
   components: {
@@ -92,10 +92,34 @@ export default {
         { count: 0, label: 'New Booking' },
         { count: 0, label: 'Today Sessions' },
       ],
-      sessions: [],
+      sessions: [],  // To store the sessions fetched from the API
+      userName: localStorage.getItem('userName'),
+      doctorId: null,  // Initialize doctorId to null
     };
   },
+  computed: {
+    // Capitalize the first letter of the username
+    capitalizedUserName() {
+      return this.userName.charAt(0).toUpperCase() + this.userName.slice(1);
+    },
+  },
+  mounted() {
+    this.doctorId = localStorage.getItem('doctorId');  // Fetch doctorId from localStorage
+    if (this.doctorId) {
+      this.fetchUpcomingSessions();  // Fetch sessions only if doctorId is available
+    }
+  },
   methods: {
+    fetchUpcomingSessions() {
+      axios
+        .get(`/api/upcoming-sessions/${this.doctorId}`)  // Use doctorId in the API call
+        .then((response) => {
+          this.sessions = response.data;
+        })
+        .catch((error) => {
+          console.error("Error fetching upcoming sessions:", error);
+        });
+    },
     viewAppointments() {
       // Handle view appointments button click
     },
@@ -106,14 +130,13 @@ export default {
 <style scoped>
 /* Sidebar Styling */
 .sidebar {
-  width: 18%; /* Adjust the width of the sidebar */
-  background-color: #f8f9fa; /* Optional: Change background color */
-  overflow-y: auto; /* Makes sidebar scrollable if content is tall */
+  width: 18%;
+  background-color: #f8f9fa;
+  overflow-y: auto;
 }
 
-/* General Styling */
 .content-container {
-  margin-left: 18%; /* Match the sidebar width */
+  margin-left: 18%;
   max-width: 100%;
 }
 
@@ -142,11 +165,6 @@ export default {
   margin-top: 1rem;
 }
 
-h1, h2, h3 {
-  margin-bottom: 0.5rem;
-}
-
-/* Date Container Styling */
 .date-container {
   text-align: center;
 }
@@ -156,19 +174,14 @@ h1, h2, h3 {
   font-size: 1.75rem;
 }
 
-/* Responsive Styling */
 @media (max-width: 768px) {
   .content-container {
-    margin-left: 0; /* Adjust for smaller screens */
+    margin-left: 0;
     max-width: 100%;
   }
 
   .sidebar {
-    width: 100%; /* Sidebar full width on small screens */
-  }
-
-  .date-container {
-    text-align: center;
+    width: 100%;
   }
 
   .date-display {

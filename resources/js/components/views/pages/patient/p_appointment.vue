@@ -35,6 +35,55 @@
         <h2 class="text-center mb-4">Book an Appointment</h2>
 
         <form @submit.prevent="bookAppointment" class="needs-validation" novalidate>
+          <!-- Doctor's Name and Department -->
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label for="doctorName" class="form-label">Doctor's Name</label>
+              <input
+                type="text"
+                v-model="doctorName"
+                id="doctorName"
+                class="form-control"
+                readonly
+              />
+            </div>
+
+            <div class="col-md-6">
+              <label for="departmentName" class="form-label">Department</label>
+              <input
+                type="text"
+                v-model="departmentName"
+                id="departmentName"
+                class="form-control"
+                readonly
+              />
+            </div>
+          </div>
+
+          <!-- Available Date -->
+          <div class="row mb-3">
+            <div class="col-md-6 mb-3">
+              <label for="appointmentDate" class="form-label">Available Date</label>
+              <input
+                type="date"
+                v-model="form.appointmentDate"
+                id="appointmentDate"
+                class="form-control"
+                @change="updateSessionDetails"
+                required
+              />
+              <div class="invalid-feedback">Please select an appointment date.</div>
+            </div>
+          </div>
+
+          <!-- Display Session Details -->
+          <div v-if="sessionDetails" class="mb-4">
+            <h4>Session Details:</h4>
+            <p><strong>Start Time:</strong> {{ sessionDetails.start_time }}</p>
+            <p><strong>End Time:</strong> {{ sessionDetails.end_time }}</p>
+            <p><strong>Max Sessions Available:</strong> {{ maxSessions }}</p>
+          </div>
+
           <div class="row">
             <div class="col-md-6 mb-3">
               <label for="patientName" class="form-label">Patient's Name</label>
@@ -48,61 +97,6 @@
               />
               <div class="invalid-feedback">Please enter a patient's name.</div>
             </div>
-
-            <div class="col-md-6 mb-3">
-              <label for="sessionAvailable" class="form-label">Session Available</label>
-              <select
-                v-model="form.sessionAvailable"
-                id="sessionAvailable"
-                class="form-select"
-                required
-              >
-                <option value="" disabled>Select session</option>
-                <option v-for="session in sessions" :key="session.id" :value="session.id">
-                  {{ session.time }}
-                </option>
-              </select>
-              <div class="invalid-feedback">Please select a session.</div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="appointmentDate" class="form-label">Available Date</label>
-              <input
-                type="date"
-                v-model="form.appointmentDate"
-                id="appointmentDate"
-                class="form-control"
-                required
-              />
-              <div class="invalid-feedback">Please select an appointment date.</div>
-            </div>
-          </div>
-
-          <!-- New Fields for Doctor's Name and Department -->
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="doctorName" class="form-label">Doctor's Name</label>
-              <input
-                type="text"
-                v-model="doctorName"
-                id="doctorName"
-                class="form-control"
-                readonly
-              />
-            </div>
-
-            <div class="col-md-6 mb-3">
-              <label for="departmentName" class="form-label">Department</label>
-              <input
-                type="text"
-                v-model="departmentName"
-                id="departmentName"
-                class="form-control"
-                readonly
-              />
-            </div>
           </div>
 
           <div class="text-center">
@@ -114,6 +108,8 @@
   </div>
 </template>
 
+
+
 <script>
 import axios from 'axios';
 import Swal from 'sweetalert2';
@@ -123,12 +119,13 @@ export default {
     return {
       form: {
         patientName: "",
-        sessionAvailable: "",
         appointmentDate: "",
       },
       sessions: [], 
+      sessionDetails: null, // Store selected session details here
       doctorName: '',
-      departmentName: '', 
+      departmentName: '',
+      maxSessions: 0,
     };
   },
   mounted() {
@@ -138,18 +135,46 @@ export default {
   },
   methods: {
     fetchSessions() {
-      axios.get('/sessions')
+      axios.post('/sessions')
         .then(response => {
           console.log('Sessions fetched:', response.data);
           this.sessions = response.data;
+          this.maxSessions = this.sessions.length; // Assuming max sessions is total sessions available
         })
         .catch(error => {
           console.error('Error fetching sessions:', error);
         });
     },
 
+    updateSessionDetails() {
+      const selectedDate = this.form.appointmentDate;
+
+      // Ensure the selected date is logged for debugging
+      console.log('Selected Date:', selectedDate);
+
+      const selectedSessions = this.sessions.filter(session => session.date === selectedDate);
+
+      // Log the filtered sessions for debugging
+      console.log('Filtered Sessions:', selectedSessions);
+
+      if (selectedSessions.length > 0) {
+        this.sessionDetails = selectedSessions[0]; // Take the first session details
+      } else {
+        this.sessionDetails = null; // Reset if no sessions are found for the date
+      }
+    },
+
     bookAppointment() {
-      axios.post('/book-appointment', this.form) 
+      if (!this.sessionDetails) {
+        Swal.fire({
+          icon: 'error',
+          title: 'No session available',
+          text: 'Please select a date with an available session.',
+        });
+        return; // Prevent booking if no session details are available
+      }
+      
+      axios.post('/book-appointment', { ...this.form, sessionAvailable: this.sessionDetails.id }) 
         .then(response => {
           Swal.fire({
             icon: 'success',
@@ -175,8 +200,8 @@ export default {
 
     resetForm() {
       this.form.patientName = "";
-      this.form.sessionAvailable = "";
       this.form.appointmentDate = "";
+      this.sessionDetails = null; // Reset session details
     },
 
     // Method to capitalize the first letter of a string
@@ -186,6 +211,10 @@ export default {
   },
 };
 </script>
+
+
+
+
 
 <style scoped>
 /* Navigation Bar */

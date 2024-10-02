@@ -38,6 +38,7 @@ const routes = [
     meta: { layout: "auth" },
   },
 
+
   //admin
   {
     path: '/admin',
@@ -79,15 +80,15 @@ const routes = [
     meta: { layout: "app" },
   },
 
-  {
-    path: '/schedule',
-    name: 'schedule',
-    component: () =>
-      import(
-        /* webpackChunkName: "adminhome" */ './components/views/pages/admin/schedule.vue'
-      ),
-    meta: { layout: "app" },
-  },
+  // {
+  //   path: '/schedule',
+  //   name: 'schedule',
+  //   component: () =>
+  //     import(
+  //       /* webpackChunkName: "adminhome" */ './components/views/pages/admin/schedule.vue'
+  //     ),
+  //   meta: { layout: "app" },
+  // },
 
 
   //doctor
@@ -100,6 +101,16 @@ const routes = [
       ),
     meta: { layout: "app" },
   },
+  {
+    path: '/schedule-sess',
+    name: 'schedule-sess',
+    component: () =>
+      import(
+        /* webpackChunkName: "dochome" */ './components/views/pages/doctor/schedule.vue'
+      ),
+    meta: { layout: "auth" },
+  },
+  
 
   //patients
 
@@ -129,6 +140,15 @@ const routes = [
         /* webpackChunkName: "patienthome" */ './components/views/pages/patient/p_appointment.vue'
       ),
     meta: { layout: "auth" },
+  },
+  {
+    path: '/available-sessions',
+    name: 'available-sessions',
+    component: () =>
+      import(
+        /* webpackChunkName: "patienthome" */ './components/views/pages/patient/session.vue'
+      ),
+    // meta: { layout: "auth" },
   },
 
   

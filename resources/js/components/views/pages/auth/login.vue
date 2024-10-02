@@ -64,18 +64,24 @@ export default {
         const userType = response.data.user.user_type;
         const userName = response.data.user.name;
         const userEmail = response.data.user.email;
+
         localStorage.setItem('userType', userType);
         localStorage.setItem('userName', userName);
         localStorage.setItem('userEmail', userEmail);
 
-
-        // Redirect based on user type
-        if (userType === 'admin') {
+        // Check if user is a doctor
+        if (userType === 'doctor') {
+          // Make an additional request to fetch the doctor ID based on the email
+          const doctorResponse = await axios.post(`/doctors-by-email/${userEmail}`);
+          
+          const doctorId = doctorResponse.data.id;
+          localStorage.setItem('doctorId', doctorId); 
+          
+          this.$router.push('/doctor-dash');
+        } else if (userType === 'admin') {
           this.$router.push('/admin');
         } else if (userType === 'patient') {
           this.$router.push('/patient-dash');
-        } else if (userType === 'doctor') {
-          this.$router.push('/doctor-dash');
         }
       } catch (error) {
         if (error.response && error.response.data.errors) {
