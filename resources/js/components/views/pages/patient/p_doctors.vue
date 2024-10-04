@@ -103,17 +103,18 @@ export default {
         // New method to get appointments
         const getAppointment = async (doctorId) => {
             try {
-                const response = await axios.get(`/sessions/${doctorId}`); // Fetch sessions for the specific doctor
+                const response = await axios.get(`/sessions/${doctorId}`);
                 const sessions = response.data;
-                // Redirect to the available sessions page with the sessions data as query parameters or in the state
+
+                // Redirect to the available-sessions route with doctorId and sessions as query parameters
                 router.push({ 
                     path: '/available-sessions', 
-                    query: { doctorId, sessions: JSON.stringify(sessions) } // Passing data as query params
+                    query: { doctorId: doctorId.toString() } 
                 });
             } catch (error) {
                 console.error('Error fetching sessions:', error);
                 error.value = 'Failed to load sessions. Please try again.';
-    }
+            }
         };
 
         return {

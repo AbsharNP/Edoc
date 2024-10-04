@@ -33,6 +33,8 @@ Route::post('/doctors-by-email/{email}', [DoctorController::class, 'getDoctorByE
 
 
 Route::post('/sessions/{doctorId}', [PatientController::class, 'getSessionsByDoctorId']);
+Route::post('/appointments', [PatientController::class, 'appStore']);
+
 
 
 

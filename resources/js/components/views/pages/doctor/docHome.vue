@@ -112,7 +112,7 @@ export default {
   methods: {
     fetchUpcomingSessions() {
       axios
-        .get(`/api/upcoming-sessions/${this.doctorId}`)  // Use doctorId in the API call
+        .post(`/api/upcoming-sessions/${this.doctorId}`)  // Use doctorId in the API call
         .then((response) => {
           this.sessions = response.data;
         })
