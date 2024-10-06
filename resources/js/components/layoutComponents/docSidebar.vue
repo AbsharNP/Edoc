@@ -92,8 +92,8 @@
   
           <!-- Patients Link -->
           <tr class="menu-row">
-            <td class="menu-btn menu-icon-patient" :class="{ 'menu-active': isActive('/patients') }">
-              <router-link to="/patients" class="non-style-link-menu" active-class="non-style-link-menu-active">
+            <td class="menu-btn menu-icon-patient" :class="{ 'menu-active': isActive('/my-patients') }">
+              <router-link to="/my-patients" class="non-style-link-menu" active-class="non-style-link-menu-active">
                 <div class="menu-item">
                   <i class="fas fa-procedures"></i>
                   <p class="menu-text">Patients</p>

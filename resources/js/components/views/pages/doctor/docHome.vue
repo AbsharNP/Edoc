@@ -18,9 +18,11 @@
                 Thanks for joining with us. We are always trying to get you a complete service.
                 You can view your daily schedule, Reach Patients Appointment at home!
               </p>
-              <button @click="viewAppointments" class="btn btn-primary">
+              <router-link to="/appointment">
+              <button class="btn btn-primary">
                 View My Appointments
               </button>
+            </router-link>
             </div>
             <div class="text-center date-container" style="width: 200px;">
               <p class="mb-0 text-muted">Today's Date</p>
@@ -32,10 +34,12 @@
         <!-- Status Section -->
         <div class="row mb-4">
           <div class="col-md-3" v-for="(item, index) in statusItems" :key="index">
-            <div class="card text-center p-4 shadow-sm">
-              <h3 class="display-6">{{ item.count }}</h3>
-              <p class="text-muted">{{ item.label }}</p>
-            </div>
+            <router-link :to="item.link" class="card-link"> <!-- Add a link around the card -->
+              <div class="card text-center p-4 shadow-sm card-hover">
+                <h3 class="display-6">{{ item.count }}</h3>
+                <p class="text-muted">{{ item.label }}</p>
+              </div>
+            </router-link>
           </div>
         </div>
 
@@ -49,10 +53,11 @@
                 <th scope="col">Scheduled Date</th>
                 <th scope="col">Start Time</th>
                 <th scope="col">End Time</th>
-                <th scope="col">No. of Sessions</th>
+                <!-- <th scope="col">No. of Sessions</th> -->
               </tr>
             </thead>
             <tbody>
+              <!-- Show this row if no sessions are available -->
               <tr v-if="sessions.length === 0">
                 <td colspan="5" class="text-center">
                   <div class="d-flex justify-content-center align-items-center flex-column">
@@ -60,12 +65,14 @@
                   </div>
                 </td>
               </tr>
+
+              <!-- Iterate over the sessions fetched from the API -->
               <tr v-else v-for="(session, index) in sessions" :key="index">
                 <td>{{ index + 1 }}</td>
-                <td>{{ session.s_date }}</td>
+                <td>{{ formatDate(session.session_date) }}</td> <!-- Formatted Date -->
                 <td>{{ session.start_time }}</td>
                 <td>{{ session.end_time }}</td>
-                <td>{{ session.no_of_sessions }}</td>
+                <!-- <td>{{ session.no_of_sessions }}</td> -->
               </tr>
             </tbody>
           </table>
@@ -87,32 +94,31 @@ export default {
     return {
       todayDate: new Date().toISOString().split('T')[0],
       statusItems: [
-        { count: 1, label: 'All Doctors' },
-        { count: 2, label: 'All Patients' },
-        { count: 0, label: 'New Booking' },
-        { count: 0, label: 'Today Sessions' },
+        { count: 1, label: 'All Doctors', link: '/doctors' },
+        { count: 2, label: 'All Patients', link: '/patients' },
+        { count: 0, label: 'New Booking', link: '/bookings' },
+        { count: 0, label: 'Today Sessions', link: '/sessions/today' },
       ],
       sessions: [],  // To store the sessions fetched from the API
       userName: localStorage.getItem('userName'),
-      doctorId: null,  // Initialize doctorId to null
+      doctorId: localStorage.getItem('doctorId'),  // Fetch doctorId from localStorage
     };
   },
   computed: {
-    // Capitalize the first letter of the username
     capitalizedUserName() {
-      return this.userName.charAt(0).toUpperCase() + this.userName.slice(1);
+      return this.userName ? this.userName.charAt(0).toUpperCase() + this.userName.slice(1) : 'User';
     },
   },
   mounted() {
-    this.doctorId = localStorage.getItem('doctorId');  // Fetch doctorId from localStorage
     if (this.doctorId) {
       this.fetchUpcomingSessions();  // Fetch sessions only if doctorId is available
+    } else {
+      console.error("No doctorId found in localStorage.");
     }
   },
   methods: {
     fetchUpcomingSessions() {
-      axios
-        .post(`/api/upcoming-sessions/${this.doctorId}`)  // Use doctorId in the API call
+      axios.post(`/upcsessions/${this.doctorId}`)  // Use 'this.doctorId' to access the data
         .then((response) => {
           this.sessions = response.data;
         })
@@ -121,7 +127,11 @@ export default {
         });
     },
     viewAppointments() {
-      // Handle view appointments button click
+      router
+    },
+    formatDate(dateString) {
+      const date = new Date(dateString); // Convert string to Date object
+      return date.toLocaleDateString('en-GB'); // Format date to dd/mm/yyyy
     },
   },
 };
@@ -146,6 +156,16 @@ export default {
 
 .card {
   border-radius: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: scale(1.05); 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+}
+
+.card-link {
+  text-decoration: none;
 }
 
 .shadow-sm {
@@ -163,6 +183,11 @@ export default {
 
 .table {
   margin-top: 1rem;
+}
+
+.table tbody tr:hover {
+  cursor: pointer; /* Change the cursor to a pointer on hover */
+  background-color: #f8f9fa; /* Optional: Change background color on hover for better visibility */
 }
 
 .date-container {

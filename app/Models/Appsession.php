@@ -9,6 +9,7 @@ class Appsession extends Model
 {
     use HasFactory;
 
+    protected $table = 'appsessions'; // Ensure this matches the actual table name
     protected $fillable = [
         'doctor_id',
         'session_date', // Use the correct column name
@@ -19,7 +20,7 @@ class Appsession extends Model
 
     public function doctor()
     {
-        return $this->belongsTo(Doctor::class);
+        return $this->belongsTo(Doctor::class, 'doctor_id');
     }
 
     protected $casts = [

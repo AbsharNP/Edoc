@@ -10,6 +10,7 @@ class Appointment extends Model
     use HasFactory;
     protected $fillable = [
         'patient_name',
+        'user_id',
         'address',
         'phone_number',
         'email',
@@ -17,4 +18,9 @@ class Appointment extends Model
         'treatment_completed',
         'prescription',
     ];
+
+    public function appsession()
+    {
+        return $this->belongsTo(Appsession::class, 'session_id');
+    }
 }

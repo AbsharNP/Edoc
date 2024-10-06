@@ -19,7 +19,7 @@ class AppointmentRequest extends FormRequest
             'address' => 'required|string|max:255',
             'phone_number' => 'required|string|max:20',
             'email' => 'nullable|email|max:255',
-            'session_id' => 'required|exists:appsessions,id', // Ensure the session ID exists
+            'session_id' => 'required|exists:appsessions,id', 
             'treatment_completed' => 'nullable|boolean',
             'prescription' => 'nullable|string',
         ];

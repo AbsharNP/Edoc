@@ -108,7 +108,24 @@ const routes = [
       import(
         /* webpackChunkName: "dochome" */ './components/views/pages/doctor/schedule.vue'
       ),
-    meta: { layout: "auth" },
+
+    },
+  {
+    path: '/appointment',
+    name: 'appointment',
+    component: () =>
+      import(
+        /* webpackChunkName: "dochome" */ './components/views/pages/doctor/d_appointments.vue'
+      ),
+  },
+
+  {
+    path: '/my-patients',
+    name: 'my-patients',
+    component: () =>
+      import(
+        /* webpackChunkName: "dochome" */ './components/views/pages/doctor/my_patients.vue'
+      ),
   },
   
 
@@ -133,13 +150,13 @@ const routes = [
     meta: { layout: "app" },
   },
   {
-    path: '/appointment',
-    name: 'appointment',
+    path: '/my-appointment',
+    name: 'my-appointment',
     component: () =>
       import(
         /* webpackChunkName: "patienthome" */ './components/views/pages/patient/p_appointment.vue'
       ),
-    meta: { layout: "auth" },
+    
   },
   {
     path: '/available-sessions',

@@ -6,8 +6,10 @@ use App\Http\Requests\AppointmentRequest;
 use App\Models\Appointment;
 use App\Models\Appsession;
 use App\Models\Doctor;
+use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Response;
 
 class PatientController extends Controller
 {
@@ -51,9 +53,37 @@ class PatientController extends Controller
     {
         $validatedData = $request->validated();
     
+        $validatedData['user_id'] = auth()->id();
+    
         $appointment = Appointment::create($validatedData);
-
+    
         return response()->json(['message' => 'Appointment booked successfully', 'appointment' => $appointment], 201);
+    }
+
+    public function myAppointments(Request $request)
+    {
+        // Assuming you are using auth to get the logged-in user's ID.
+        $userId = $request->user()->id;
+
+        // Fetch appointments along with session and doctor data
+        $appointments = Appointment::with(['appsession.doctor'])
+            ->where('user_id', $userId) 
+            ->get();
+
+        return response()->json($appointments);
+    }
+
+    public function destroyApp($id)
+    {
+        $appointment = Appointment::find($id);
+
+        if (!$appointment) {
+            return response()->json(['message' => 'Appointment not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $appointment->delete();
+
+        return response()->json(['message' => 'Appointment deleted successfully'], Response::HTTP_OK);
     }
 
 }
