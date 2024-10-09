@@ -86,4 +86,29 @@ class PatientController extends Controller
         return response()->json(['message' => 'Appointment deleted successfully'], Response::HTTP_OK);
     }
 
+    public function getAppointmentsByUser(Request $request)
+    {
+        $userId = $request->query('user_id'); // Get the userId from query parameters
+
+        $appointments = Appointment::where('user_id', $userId)->get();
+
+        if ($appointments->isEmpty()) {
+            return response()->json(['message' => 'No appointments found'], 404);
+        }
+
+        return response()->json($appointments, 200);
+    }
+
+    // Fetch a specific appointment by ID
+    public function getAppointmentById($id)
+    {
+        $appointment = Appointment::find($id);
+
+        if (!$appointment) {
+            return response()->json(['message' => 'Appointment not found'], 404);
+        }
+
+        return response()->json($appointment, 200);
+    }
+
 }

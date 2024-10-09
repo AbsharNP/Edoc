@@ -8,6 +8,7 @@ use App\Models\Appsession;
 use App\Models\Doctor;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class DoctorController extends Controller
 {
@@ -87,17 +88,47 @@ class DoctorController extends Controller
         return response()->json($appointments);
     } 
     
-    public function getCompletedTreatments($doctorId, $sessionId)
-{
-    // Fetch completed treatments for the doctor in a specific session
-    $appointments = Appointment::select('appointments.*', 'appsessions.session_date as session_date')
-        ->join('appsessions', 'appointments.session_id', '=', 'appsessions.id')
-        ->where('appsessions.doctor_id', $doctorId)
-        ->where('appointments.session_id', $sessionId)
-        ->where('appointments.treatment_completed', '1') // Assuming this field exists
-        ->get();
 
-    return response()->json($appointments);
-}
     
+
+    // Submit prescription
+    public function submitPrescription(Request $request)
+    {
+        // Validate the request data
+        $request->validate([
+            'appointmentId' => 'required|exists:appointments,id', // Ensure the appointment exists
+            'prescription' => 'required|string',
+            'treatment_status' => 'required|integer',
+        ]);
+
+        // Find the appointment by ID
+        $appointment = Appointment::find($request->appointmentId);
+
+        // Update the appointment with the prescription and treatment status
+        $appointment->prescription = $request->prescription;
+        $appointment->dr_name = $request->dr_name;
+        $appointment->treatment_status = $request->treatment_status;
+        $appointment->save(); // Save the changes to the database
+
+        return response()->json(['message' => 'Prescription submitted successfully'], 200);
+    }
+
+    public function show($id)
+    {
+        // Fetch the appointment by ID, along with the related session data
+        $appointment = Appointment::with('appsession')->findOrFail($id);
+
+        // Format the response data
+        $data = [
+            'patient_name' => $appointment->patient_name,
+            'phone_number' => $appointment->phone_number,
+            'address' => $appointment->address,
+            'email' => $appointment->email,
+            'session_date' => optional($appointment->appsession)->session_date, // Assuming 'date' is the column name in the appsession table
+            'treatment_status' => $appointment->treatment_status,
+            'prescription' => $appointment->prescription,
+        ];
+
+        return response()->json($data);
+    }
 }

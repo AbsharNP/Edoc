@@ -15,12 +15,15 @@ class Appointment extends Model
         'phone_number',
         'email',
         'session_id',
-        'treatment_completed',
+        'treatment_status',
         'prescription',
+        'dr_name',
     ];
 
     public function appsession()
     {
         return $this->belongsTo(Appsession::class, 'session_id');
     }
+
+    
 }

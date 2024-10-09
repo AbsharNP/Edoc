@@ -26,4 +26,9 @@ class Appsession extends Model
     protected $casts = [
         'session_date' => 'date',
     ];
+
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class, 'session_id');
+    }
 }

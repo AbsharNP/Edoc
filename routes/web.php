@@ -34,14 +34,17 @@ Route::post('/upcsessions/{doctorId}', [DoctorController::class, 'getSessions'])
 Route::post('/appointments/{doctorId}', [DoctorController::class, 'getAppointmentsByDoctorId']);
 Route::post('/appointments/today/{doctorId}', [DoctorController::class, 'getTodaysAppointmentsByDoctorId']);
 
-Route::post('/appointments/treatments/completed/{doctorId}/{sessionId}', [DoctorController::class, 'getCompletedTreatments']);
-
+Route::post('/treatment/{id}', [DoctorController::class, 'show']);
+Route::post('/submit-prescription', [DoctorController::class, 'submitPrescription']);
 
 
 // patient
 Route::post('/sessions/{doctorId}', [PatientController::class, 'getSessionsByDoctorId']);
 Route::post('/appointments', [PatientController::class, 'appStore']);
 Route::post('/my-appointments', [PatientController::class, 'myAppointments']);
+
+Route::post('/appointments', [PatientController::class, 'getAppointmentsByUser']);
+Route::post('/appointments/{id}', [PatientController::class, 'getAppointmentById']);
 
 
 

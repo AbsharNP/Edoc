@@ -47,7 +47,7 @@ const routes = [
       import(
         /* webpackChunkName: "adminhome" */ './components/views/pages/admin/adminHome.vue'
       ),
-    meta: { layout: "app" },
+    meta: { layout: "app" , requiresAuth: true, userType: 'admin'},
   },
 
   {
@@ -57,7 +57,7 @@ const routes = [
       import(
         /* webpackChunkName: "adminhome" */ './components/views/pages/admin/doctors.vue'
       ),
-    meta: { layout: "app" },
+    meta: { layout: "app" , requiresAuth: true, userType: 'admin'},
   },
 
   {
@@ -67,7 +67,7 @@ const routes = [
       import(
         /* webpackChunkName: "adminhome" */ './components/views/pages/admin/addDoctor.vue'
       ),
-    meta: { layout: "auth" },
+    meta: { layout: "auth" , requiresAuth: true, userType: 'admin'},
   },
 
   {
@@ -77,18 +77,9 @@ const routes = [
       import(
         /* webpackChunkName: "adminhome" */ './components/views/pages/admin/departments.vue'
       ),
-    meta: { layout: "app" },
+    meta: { layout: "app" , requiresAuth: true, userType: 'admin'},
   },
 
-  // {
-  //   path: '/schedule',
-  //   name: 'schedule',
-  //   component: () =>
-  //     import(
-  //       /* webpackChunkName: "adminhome" */ './components/views/pages/admin/schedule.vue'
-  //     ),
-  //   meta: { layout: "app" },
-  // },
 
 
   //doctor
@@ -99,7 +90,7 @@ const routes = [
       import(
         /* webpackChunkName: "dochome" */ './components/views/pages/doctor/docHome.vue'
       ),
-    meta: { layout: "app" },
+    meta: { layout: "app" , requiresAuth: true, userType: 'doctor'},
   },
   {
     path: '/schedule-sess',
@@ -108,7 +99,7 @@ const routes = [
       import(
         /* webpackChunkName: "dochome" */ './components/views/pages/doctor/schedule.vue'
       ),
-
+      meta: { layout: "app" , requiresAuth: true, userType: 'doctor'},
     },
   {
     path: '/appointment',
@@ -117,6 +108,7 @@ const routes = [
       import(
         /* webpackChunkName: "dochome" */ './components/views/pages/doctor/d_appointments.vue'
       ),
+      meta: { layout: "app" , requiresAuth: true, userType: 'doctor'},
   },
 
   {
@@ -126,7 +118,27 @@ const routes = [
       import(
         /* webpackChunkName: "dochome" */ './components/views/pages/doctor/my_patients.vue'
       ),
+      meta: { layout: "app" , requiresAuth: true, userType: 'doctor'},
   },
+  {
+    path: '/treatment/:id',
+    name: 'treatment',
+    component: () =>
+      import(
+        /* webpackChunkName: "dochome" */ './components/views/pages/doctor/treatment.vue'
+      ),
+      meta: { layout: "app" , requiresAuth: true, userType: 'doctor'},
+  },
+  {
+    path: '/treatment-completed',
+    name: 'treatmented',
+    component: () =>
+      import(
+        /* webpackChunkName: "dochome" */ './components/views/pages/doctor/treated_patients.vue'
+      ),
+      meta: { layout: "app" , requiresAuth: true, userType: 'doctor'},
+  },
+  
   
 
   //patients
@@ -147,7 +159,7 @@ const routes = [
       import(
         /* webpackChunkName: "patienthome" */ './components/views/pages/patient/p_doctors.vue'
       ),
-    meta: { layout: "app" },
+    meta: { requiresAuth: true, userType: 'patient'},
   },
   {
     path: '/my-appointment',
@@ -156,7 +168,7 @@ const routes = [
       import(
         /* webpackChunkName: "patienthome" */ './components/views/pages/patient/p_appointment.vue'
       ),
-    
+      meta: { layout: "app" ,requiresAuth: true, userType: 'patient'},
   },
   {
     path: '/available-sessions',
@@ -165,17 +177,42 @@ const routes = [
       import(
         /* webpackChunkName: "patienthome" */ './components/views/pages/patient/session.vue'
       ),
-    // meta: { layout: "auth" },
-  },
-
+      meta: { layout: "app" ,requiresAuth: true, userType: 'patient'},
+    },
+  {
+    path: '/view-prescriptions',
+    name: 'viewprescription',
+    component: () =>
+      import(
+        /* webpackChunkName: "patienthome" */ './components/views/pages/patient/view_prescription.vue'
+      ),
+      meta: { layout: "app" ,requiresAuth: true, userType: 'patient'},
+    },
   
   
 ];
 
-// Create the router instance
+
 const router = createRouter({
   history: createWebHistory(),
   routes
+});
+
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = localStorage.getItem('isAuthenticated'); 
+  const userType = localStorage.getItem('userType'); 
+
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (!isAuthenticated) {
+      next({ name: 'login' }); 
+    } else if (to.meta.userType && to.meta.userType !== userType) {
+      next({ name: 'login' }); 
+    } else {
+      next(); 
+    }
+  } else {
+    next();
+  }
 });
 
 export default router;

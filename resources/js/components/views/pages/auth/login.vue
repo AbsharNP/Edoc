@@ -59,12 +59,16 @@ export default {
           email: this.email,
           password: this.password,
           remember: this.remember,
+          
         });
 
         const userType = response.data.user.user_type;
         const userName = response.data.user.name;
         const userEmail = response.data.user.email;
-
+        const userId = response.data.user.id;
+        
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('userId', userId);
         localStorage.setItem('userType', userType);
         localStorage.setItem('userName', userName);
         localStorage.setItem('userEmail', userEmail);

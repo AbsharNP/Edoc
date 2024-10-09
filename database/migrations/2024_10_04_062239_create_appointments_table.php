@@ -21,7 +21,7 @@ class CreateAppointmentsTable extends Migration
             $table->string('phone_number'); 
             $table->string('email')->nullable();
             $table->foreignId('session_id')->constrained('appsessions')->onDelete('cascade'); 
-            $table->boolean('treatment_completed')->default(0); 
+            $table->boolean('treatment_status')->default(0); 
             $table->text('prescription')->nullable(); 
             $table->timestamps(); 
         });

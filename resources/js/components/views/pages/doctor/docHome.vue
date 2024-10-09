@@ -94,10 +94,10 @@ export default {
     return {
       todayDate: new Date().toISOString().split('T')[0],
       statusItems: [
-        { count: 1, label: 'All Doctors', link: '/doctors' },
-        { count: 2, label: 'All Patients', link: '/patients' },
-        { count: 0, label: 'New Booking', link: '/bookings' },
-        { count: 0, label: 'Today Sessions', link: '/sessions/today' },
+        // { count: 1, label: 'All Doctors', link: '/doctors' },
+        // { count: 2, label: 'All Patients', link: '/patients' },
+        // { count: 0, label: 'New Booking', link: '/bookings' },
+        // { count: 0, label: 'Today Sessions', link: '/sessions/today' },
       ],
       sessions: [],  // To store the sessions fetched from the API
       userName: localStorage.getItem('userName'),

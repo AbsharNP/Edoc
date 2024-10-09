@@ -92,8 +92,8 @@
   
           <!-- Patients Link -->
           <tr class="menu-row">
-            <td class="menu-btn menu-icon-patient" :class="{ 'menu-active': isActive('/my-patients') }">
-              <router-link to="/my-patients" class="non-style-link-menu" active-class="non-style-link-menu-active">
+            <td class="menu-btn menu-icon-patient" :class="{ 'menu-active': isActive('/treatment-completed') }">
+              <router-link to="/treatment-completed" class="non-style-link-menu" active-class="non-style-link-menu-active">
                 <div class="menu-item">
                   <i class="fas fa-procedures"></i>
                   <p class="menu-text">Patients</p>
@@ -139,6 +139,10 @@
           localStorage.removeItem('authToken');
           localStorage.removeItem('userName');
           localStorage.removeItem('userEmail');
+          localStorage.removeItem('isAuthenticated');
+          localStorage.removeItem('userId');
+          localStorage.removeItem('userType');
+  
   
           // Redirect the user to the login page
           this.$router.push({ name: 'login' });

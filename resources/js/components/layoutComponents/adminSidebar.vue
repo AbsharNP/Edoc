@@ -128,6 +128,11 @@ export default {
         
         // Clear local storage or session data if required
         localStorage.removeItem('authToken');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('isAuthenticated');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('userType');
 
         // Redirect the user to the login page
         this.$router.push({ name: 'login' });
