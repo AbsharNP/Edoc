@@ -24,7 +24,7 @@
               <th>Address</th>
               <th>Phone Number</th>
               <th>Session ID</th>
-              <th>Session Date</th>
+              <!-- <th>Session Date</th> -->
               <th v-if="showToday">Action</th>
             </tr>
           </thead>
@@ -36,7 +36,7 @@
               <td>{{ appointment.patient_name }}</td>
               <td>{{ appointment.address }}</td>
               <td>{{ appointment.phone_number }}</td>
-              <td>{{ appointment.session_id }}</td>
+              <!-- <td>{{ appointment.session_id }}</td> -->
               <td>{{ formatDate(appointment.session_date) }}</td> 
               <td v-if="showToday">
                 <router-link 

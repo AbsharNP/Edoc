@@ -6,10 +6,11 @@ use App\Http\Requests\AppointmentRequest;
 use App\Models\Appointment;
 use App\Models\Appsession;
 use App\Models\Doctor;
-use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class PatientController extends Controller
 {
@@ -23,17 +24,14 @@ class PatientController extends Controller
             return response()->json(['error' => 'Invalid doctor ID.'], 400);
         }
 
-        // Fetch doctor information
         $doctor = Doctor::find($doctorId);
         
-        // Fetch sessions
         $sessions = Appsession::where('doctor_id', $doctorId)->get();
 
         if ($sessions->isEmpty()) {
             return response()->json(['doctor' => $doctor, 'sessions' => [], 'message' => 'No sessions found for this doctor.'], 404);
         }
 
-        // Format session details before returning
         return response()->json([
             'doctor' => $doctor,
             'sessions' => $sessions->map(function ($session) {
@@ -62,10 +60,8 @@ class PatientController extends Controller
 
     public function myAppointments(Request $request)
     {
-        // Assuming you are using auth to get the logged-in user's ID.
         $userId = $request->user()->id;
 
-        // Fetch appointments along with session and doctor data
         $appointments = Appointment::with(['appsession.doctor'])
             ->where('user_id', $userId) 
             ->get();
@@ -86,20 +82,21 @@ class PatientController extends Controller
         return response()->json(['message' => 'Appointment deleted successfully'], Response::HTTP_OK);
     }
 
-    public function getAppointmentsByUser(Request $request)
-    {
-        $userId = $request->query('user_id'); // Get the userId from query parameters
+    public function getDoneAppointments(Request $request)
+{
+    $userId = $request->query('user_id'); 
 
-        $appointments = Appointment::where('user_id', $userId)->get();
+    $appointments = Appointment::where('user_id', $userId)
+                               ->where('treatment_status', 1) 
+                               ->get();
 
-        if ($appointments->isEmpty()) {
-            return response()->json(['message' => 'No appointments found'], 404);
-        }
-
-        return response()->json($appointments, 200);
+    if ($appointments->isEmpty()) {
+        return response()->json(['message' => 'No completed appointments found'], 404);
     }
 
-    // Fetch a specific appointment by ID
+    return response()->json($appointments, 200);
+}
+
     public function getAppointmentById($id)
     {
         $appointment = Appointment::find($id);
@@ -111,4 +108,38 @@ class PatientController extends Controller
         return response()->json($appointment, 200);
     }
 
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
+    
+        // Validate the request
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'profile_pic' => 'nullable|image|max:10048',
+            'password' => 'nullable|string|min:8|confirmed',
+        ]);
+    
+        $user->name = $request->name;
+        $user->email = $request->email;
+    
+        if ($request->password) {
+            $user->password = Hash::make($request->password);
+        }
+    
+        if ($request->hasFile('profile_pic')) {
+            $filePath = $request->file('profile_pic')->store('profile_pics', 'public');
+            $user->profile_pic = $filePath;
+        }
+    
+        $user->save();
+    
+        return response()->json(['message' => 'Profile updated successfully']);
+    }
+    public function getProfile()
+    {
+        $user = Auth::user();
+        
+        return response()->json($user);
+    }
 }

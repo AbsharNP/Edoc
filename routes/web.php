@@ -26,6 +26,9 @@ Route::post('/add-department', [AdminController::class, 'depStore']);
 Route::post('/departments', [AdminController::class, 'depIndex']);
 Route::delete('/depdlt/{id}', [AdminController::class, 'depDestroy']);
 
+Route::post('/analyse', [AdminController::class, 'getAppointmentStats']);
+
+
 //doc
 Route::post('/create-sessions', [DoctorController::class, 'sessionstore']);
 Route::post('/doctors-by-email/{email}', [DoctorController::class, 'getDoctorByEmail']);
@@ -43,8 +46,11 @@ Route::post('/sessions/{doctorId}', [PatientController::class, 'getSessionsByDoc
 Route::post('/appointments', [PatientController::class, 'appStore']);
 Route::post('/my-appointments', [PatientController::class, 'myAppointments']);
 
-Route::post('/appointments', [PatientController::class, 'getAppointmentsByUser']);
+Route::post('/getprescription', [PatientController::class, 'getDoneAppointments']);
 Route::post('/appointments/{id}', [PatientController::class, 'getAppointmentById']);
+
+Route::post('/user/update-profile', [PatientController::class, 'updateProfile']);
+Route::post('/user/profile', [PatientController::class, 'getProfile']); // To get curre
 
 
 

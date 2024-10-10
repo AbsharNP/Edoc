@@ -58,9 +58,9 @@ export default {
       userName: localStorage.getItem('userName') ,
       cards: [
         { title: 'My Appointments', description: 'Track all your current appointments', link: '/my-appointment' },
-        { title: 'History', description: 'View your appointment history', link: '/appointment-history' },
+        // { title: 'History', description: 'View your appointment history', link: '/appointment-history' },
         { title: 'Prescriptions', description: 'Check your prescribed medications', link: '/view-prescriptions' },
-        { title: 'Medical Reports', description: 'View your uploaded medical reports', link: '/medical-reports' }
+        // { title: 'Medical Reports', description: 'View your uploaded medical reports', link: '/medical-reports' }
       ],
     };
   },

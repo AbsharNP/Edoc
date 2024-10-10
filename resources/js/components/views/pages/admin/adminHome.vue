@@ -22,7 +22,7 @@
             </div>
           </div>
 
-          <div class="col-md-6 mb-4">
+          <!-- <div class="col-md-6 mb-4">
             <div class="card text-center">
               <div class="card-body shadow-lg">
                 <router-link to="/patient-view" class="no-underline">
@@ -32,9 +32,9 @@
                 </router-link>
               </div>
             </div>
-          </div>
+          </div> -->
 
-          <div class="col-md-6 mb-4">
+          <!-- <div class="col-md-6 mb-4">
             <div class="card text-center">
               <div class="card-body shadow-lg">
                 <router-link to="/appointment-view" class="no-underline">
@@ -44,7 +44,7 @@
                 </router-link>
               </div>
             </div>
-          </div>
+          </div> -->
 
           <div class="col-md-6 mb-4">
             <div class="card text-center">

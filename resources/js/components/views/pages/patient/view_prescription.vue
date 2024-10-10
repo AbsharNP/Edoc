@@ -105,7 +105,7 @@ export default {
   },
   methods: {
     fetchAppointments() {
-      axios.post(`/appointments?user_id=${this.userId}`)
+      axios.post(`/getprescription?user_id=${this.userId}`)
         .then(response => {
           this.appointments = response.data;
         })

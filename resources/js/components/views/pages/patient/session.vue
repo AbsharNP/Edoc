@@ -6,9 +6,13 @@
 
     <div class="col-md-9 col-lg-10 layout-px-spacing">
       <div class="container">
+        <!-- Error message -->
         <div v-if="error" class="alert alert-danger">{{ error }}</div>
+        
+        <!-- No sessions available -->
         <div v-if="!filteredSessions.length && !error" class="alert alert-info">No available sessions.</div>
 
+        <!-- Doctor Information -->
         <div v-if="doctor" class="doctor-info mb-3">
           <h5>Doctor Information</h5>
           <p><strong>Name:</strong> {{ doctor.name }}</p>
@@ -16,6 +20,7 @@
           <p><strong>Phone Number:</strong> {{ doctor.phone_number }}</p>
         </div>
 
+        <!-- Session List -->
         <table class="table table-striped table-hover" v-if="filteredSessions.length">
           <thead>
             <tr>
@@ -39,7 +44,7 @@
           </tbody>
         </table>
 
-        <!-- Modal for booking session -->
+        <!-- Modal for Booking a Session -->
         <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
           <div class="modal-dialog">
             <div class="modal-content">
@@ -74,8 +79,8 @@
                     <label for="termsCheckbox" class="form-check-label">I agree to the terms and conditions <span class="text-danger">*</span></label>
                   </div>
 
-                  <input type="hidden" v-model="bookingData.sessionId" /> <!-- Keep hidden session ID -->
-                  
+                  <input type="hidden" v-model="bookingData.sessionId" /> <!-- Session ID -->
+
                   <div class="d-flex justify-content-center">
                     <button type="submit" class="btn btn-primary">Submit Appointment</button>
                   </div>
@@ -92,7 +97,7 @@
 
 <script>
 import { ref, onMounted, computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import PatSidebar from '../../../layoutComponents/patientSidebar.vue';
@@ -102,11 +107,10 @@ export default {
 
   setup() {
     const route = useRoute();
-    const router = useRouter();
     const sessions = ref([]);
     const error = ref(null);
     const doctor = ref(null);
-    const doctorId = ref(route.query.doctorId);
+    const doctorId = ref(route.query.doctorId); // Get doctorId from query params
     const bookingData = ref({
       patientName: '',
       address: '',
@@ -120,6 +124,7 @@ export default {
       fetchSessions();
     });
 
+    // Fetch doctor sessions
     const fetchSessions = async () => {
       try {
         const response = await axios.post(`/sessions/${doctorId.value}`);
@@ -127,110 +132,65 @@ export default {
         doctor.value = doctorData;
         sessions.value = allSessions;
       } catch (err) {
-        console.error('Error fetching sessions:', err.response?.data || err.message);
         error.value = 'Failed to load sessions. Please try again.';
       }
     };
 
+    // Filter upcoming sessions
     const filteredSessions = computed(() => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      return sessions.value
-        .filter(session => {
-          const sessionDate = new Date(session.session_date);
-          const sessionEndTime = new Date(`${session.session_date}T${session.end_time}`);
-          return sessionDate >= today && sessionEndTime >= new Date();
-        })
-        .sort((a, b) => {
-          const dateA = new Date(a.session_date);
-          const dateB = new Date(b.session_date);
-          
-          if (dateA.getTime() !== dateB.getTime()) {
-            return dateA - dateB;
-          }
-
-          const startTimeA = new Date(`${a.session_date}T${a.start_time}`);
-          const startTimeB = new Date(`${b.session_date}T${b.start_time}`);
-          return startTimeA - startTimeB;
-        });
+      return sessions.value.filter(session => {
+        const sessionDate = new Date(session.session_date);
+        return sessionDate >= today;
+      });
     });
 
-    const formatDate = (date) => new Date(date).toLocaleDateString(undefined, {
-      year: 'numeric', month: 'long', day: 'numeric'
-    });
-
+    // Format date and time
+    const formatDate = (date) => new Date(date).toLocaleDateString();
     const formatTime = (time) => {
-      if (!time) return 'N/A';
       const [hours, minutes] = time.split(':');
       const date = new Date();
-      date.setHours(parseInt(hours), parseInt(minutes));
+      date.setHours(hours, minutes);
       return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
     };
 
+    // Open booking modal
     const openModal = (sessionId) => {
-      bookingData.value.sessionId = sessionId; // Set the session ID to booking data
-      console.log("Selected session ID:", bookingData.value.sessionId); // Log the session ID
-      bookingData.value.agreeToTerms = false; // Reset the checkbox state
+      bookingData.value.sessionId = sessionId;
+      bookingData.value.agreeToTerms = false;
       const modal = new bootstrap.Modal(document.getElementById('bookingModal'));
       modal.show();
     };
 
+    // Close modal and reset data
     const closeModal = () => {
-      // Reset booking data
-      bookingData.value = {
-        patientName: '',
-        address: '',
-        phoneNumber: '',
-        email: '',
-        sessionId: '', // Reset the sessionId
-        agreeToTerms: false // Reset the checkbox state
-      };
+      bookingData.value = { patientName: '', address: '', phoneNumber: '', email: '', sessionId: '', agreeToTerms: false };
       const modal = bootstrap.Modal.getInstance(document.getElementById('bookingModal'));
       modal.hide();
     };
 
+    // Submit appointment booking
     const submitBooking = async () => {
-      // Simple check condition before submitting
-      if (!bookingData.value.patientName || !bookingData.value.address || !bookingData.value.phoneNumber || !bookingData.value.agreeToTerms) {
-        error.value = 'Please fill out all required fields and agree to the terms and conditions.';
-        return;
-      }
+  try {
+    const response = await axios.post('/appointments', {
+      patient_name: bookingData.value.patientName,
+      address: bookingData.value.address,
+      phone_number: bookingData.value.phoneNumber,
+      email: bookingData.value.email,
+      session_id: bookingData.value.sessionId, // Make sure session_id is being sent correctly
+      dr_name: doctor.value.name // Assuming doctor info comes from the Vue component
+    });
 
-      try {
-        await bookAppointment(); // Call the function to book the appointment
-        closeModal();
-
-        // Show success alert
-        Swal.fire({
-          title: 'Appointment Submitted!',
-          text: 'Your appointment has been booked successfully.',
-          icon: 'success',
-          confirmButtonText: 'Okay',
-          backdrop: true,
-          customClass: {
-            popup: 'centered-popup' // Class to adjust position
-          },
-        });
-      } catch (err) {
-        console.error('Error booking session:', err.response?.data || err.message);
-        error.value = 'Failed to book session. Please try again.';
-      }
-    };
-
-    const bookAppointment = async () => {
-      // API call to save appointment to the database
-      const response = await axios.post('/appointments', {
-        patient_name: bookingData.value.patientName,
-        address: bookingData.value.address,
-        phone_number: bookingData.value.phoneNumber,
-        email: bookingData.value.email,
-        session_id: bookingData.value.sessionId, // Include session ID here
-        treatment_completed: 0, // Default to 0 (not completed)
-        prescription: null // Assuming no prescription is provided
-      });
-      return response.data;
-    };
+    console.log('Appointment booked:', response.data);
+    closeModal();
+    Swal.fire('Success', 'Appointment booked successfully', 'success');
+  } catch (error) {
+    console.error('Error booking appointment:', error);
+    Swal.fire('Error', 'Failed to book appointment', 'error');
+  }
+};
 
     return {
       sessions,
@@ -253,6 +213,6 @@ export default {
   position: fixed;
   top: 50% !important;
   left: 50% !important;
-  transform: translate(-50%, -50%) !important; /* Center the popup */
+  transform: translate(-50%, -50%) !important;
 }
 </style>

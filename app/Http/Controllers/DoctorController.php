@@ -7,7 +7,9 @@ use App\Models\Appointment;
 use App\Models\Appsession;
 use App\Models\Doctor;
 use Carbon\Carbon;
+use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class DoctorController extends Controller
@@ -131,4 +133,7 @@ class DoctorController extends Controller
 
         return response()->json($data);
     }
+
+   
+
 }

@@ -30,7 +30,7 @@
             <th>Patient Name</th>
             <th>Address</th>
             <th>Phone Number</th>
-            <th>Session ID</th>
+            <!-- <th>Session ID</th> -->
             <th>Session Date</th>
             <th v-if="showToday">Action</th> <!-- Action column appears if today is selected -->
           </tr>
@@ -43,7 +43,7 @@
             <td>{{ appointment.patient_name }}</td>
             <td>{{ appointment.address }}</td>
             <td>{{ appointment.phone_number }}</td>
-            <td>{{ appointment.session_id }}</td>
+            <!-- <td>{{ appointment.session_id }}</td> -->
             <td>{{ formatDate(appointment.session_date) }}</td> 
             <td v-if="showToday">
               <router-link 
@@ -107,21 +107,30 @@ export default {
     },
 
     fetchAllAppointments() {
-      this.showToday = false;
-      this.showAll = true;
+  this.showToday = false;
+  this.showAll = true;
 
-      // Fetch all appointments
-      axios.post(`/appointments/${this.doctorId}`)
-        .then(response => {
-          this.appointments = response.data.map(appointment => {
-            appointment.session_date = this.formatDate(appointment.session_date); // Format session date
-            return appointment;
-          });
+  // Fetch all appointments
+  axios.post(`/appointments/${this.doctorId}`)
+    .then(response => {
+      this.appointments = response.data
+        .map(appointment => {
+          // Format session date and convert it for sorting
+          appointment.session_date = new Date(appointment.session_date); // Convert to Date object
+          return appointment;
         })
-        .catch(error => {
-          console.error("Error fetching all appointments:", error);
-        });
-    },
+        .sort((a, b) => a.session_date - b.session_date); // Sort in ascending order
+
+      // Optional: Format session dates back to 'dd/mm/yyyy' for display
+      this.appointments = this.appointments.map(appointment => {
+        appointment.session_date = this.formatDate(appointment.session_date);
+        return appointment;
+      });
+    })
+    .catch(error => {
+      console.error("Error fetching all appointments:", error);
+    });
+},
 
     // Format date to 'dd/mm/yyyy'
     formatDate(dateString) {

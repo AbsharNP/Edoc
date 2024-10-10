@@ -142,6 +142,7 @@
           localStorage.removeItem('isAuthenticated');
           localStorage.removeItem('userId');
           localStorage.removeItem('userType');
+          localStorage.removeItem('doctorId');
   
   
           // Redirect the user to the login page

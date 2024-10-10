@@ -38,7 +38,7 @@
                                 <tbody>
                                     <tr v-for="doctor in filteredDoctors" :key="doctor.id">
                                         <td>{{ doctor.name }}</td>
-                                        <td>{{ doctor.id }}</td> <!-- Updated to use doctor.id -->
+                                        <td>{{ doctor.doc_id }}</td>
                                         <td>{{ doctor.email }}</td>
                                         <td>{{ doctor.phone_number }}</td>
                                         <td>{{ doctor.department ? doctor.department.name : 'N/A' }}</td>

@@ -6,7 +6,7 @@
     </div>
 
     <!-- Main Content -->
-    <div class="container mt-3">
+    <div class="container ">
       <h2 class="my-4">My Appointments</h2>
 
       <div v-if="error" class="alert alert-danger">{{ error }}</div>
@@ -24,20 +24,48 @@
             <th>Action</th> <!-- Added Action column -->
           </tr>
         </thead>
-        <tbody>
-          <tr v-for="appointment in appointments" :key="appointment.id">
-            <td>{{ capitalizeWords(appointment.patient_name) }}</td>
-            <td>{{ appointment.address }}</td>
-            <td>{{ appointment.phone_number }}</td>
-            <td>{{ appointment.email || 'null' }}</td> <!-- Show 'null' if email is missing -->
-            <td>{{ formatDate(appointment.appsession.session_date) }}</td>
-            <td>{{ capitalizeWords(appointment.appsession.doctor.name) }}</td>
-            <td>{{ appointment.treatment_completed ? 'Completed' : 'Pending' }}</td>
-            <td>
-              <button class="btn btn-danger" @click="deleteAppointment(appointment.id)">Delete</button>
-            </td>
-          </tr>
-        </tbody>
+          <tbody>
+            <tr v-for="appointment in appointments" :key="appointment.id">
+              <td>{{ capitalizeWords(appointment.patient_name) }}</td>
+              <td>{{ appointment.address }}</td>
+              <td>{{ appointment.phone_number }}</td>
+              <td>{{ appointment.email || 'null' }}</td> <!-- Show 'null' if email is missing -->
+              <td>{{ formatDate(appointment.appsession.session_date) }}</td>
+              <td>{{ capitalizeWords(appointment.appsession.doctor.name) }}</td>
+              <td>{{ appointment.treatment_status ? 'Completed' : 'Pending' }}</td>
+              <td>
+                <router-link 
+                  v-if="appointment.treatment_status === 1" 
+                  :to="`/view-prescriptions`" 
+                  class="btn btn-outline-info"
+                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" 
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                stroke-width="2" stroke-linecap="round" 
+                stroke-linejoin="round" class="feather feather-eye">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z">
+                </path><circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                </router-link>
+                <button 
+                  v-else 
+                  class="btn btn-outline-danger" 
+                  @click="deleteAppointment(appointment.id)"
+                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" 
+                viewBox="0 0 24 24" fill="none" 
+                stroke="currentColor" stroke-width="2" 
+                stroke-linecap="round" stroke-linejoin="round" 
+                class="feather feather-trash">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 
+                2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                </path>
+                </svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
       </table>
     </div>
   </div>
@@ -63,14 +91,18 @@ export default {
   },
   methods: {
     async fetchAppointments() {
-      try {
-        const response = await axios.post('/my-appointments');
-        this.appointments = response.data;
-      } catch (error) {
-        console.error('Error fetching appointments:', error.response?.data || error);
-        this.error = 'Failed to load appointments.';
-      }
-    },
+    try {
+      const response = await axios.post('/my-appointments');
+      this.appointments = response.data.sort((a, b) => {
+        const dateA = new Date(a.appsession.session_date);
+        const dateB = new Date(b.appsession.session_date);
+        return dateA - dateB; // Sort in ascending order (oldest first)
+      });
+    } catch (error) {
+      console.error('Error fetching appointments:', error.response?.data || error);
+      this.error = 'Failed to load appointments.';
+    }
+  },
     async deleteAppointment(id) {
       const result = await Swal.fire({
         title: 'Are you sure?',
@@ -108,10 +140,7 @@ export default {
 </script>
 
 <style scoped>
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-}
+
 
 .table {
   margin-top: 20px;

@@ -49,6 +49,15 @@ const routes = [
       ),
     meta: { layout: "app" , requiresAuth: true, userType: 'admin'},
   },
+  {
+    path: '/analatics',
+    name: 'analatics',
+    component: () =>
+      import(
+        /* webpackChunkName: "adminhome" */ './components/views/pages/admin/analatics.vue'
+      ),
+    meta: { layout: "app" , requiresAuth: true, userType: 'admin'},
+  },
 
   {
     path: '/doctor-view',
@@ -189,6 +198,15 @@ const routes = [
       meta: { layout: "app" ,requiresAuth: true, userType: 'patient'},
     },
   
+    {
+      path: '/profile',
+      name: 'profile',
+      component: () =>
+        import(
+          /* webpackChunkName: "patienthome" */ './components/views/pages/patient/profile.vue'
+        ),
+        meta: { layout: "app" ,requiresAuth: true, userType: 'patient'},
+      },
   
 ];
 
