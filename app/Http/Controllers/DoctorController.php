@@ -44,9 +44,9 @@ class DoctorController extends Controller
         $today = Carbon::today();
 
         $sessions = Appsession::where('doctor_id', $doctorId)
-                    ->whereDate('s_date', '>=', $today)  // Fetch sessions from today and onwards
-                    ->orderBy('s_date', 'asc')  // Sort by date in ascending order
-                    ->limit(7)  // Limit to 7 rows
+                    ->whereDate('s_date', '>=', $today) 
+                    ->orderBy('s_date', 'asc')  
+                    ->limit(7)  
                     ->get();
 
         return response()->json($sessions);
@@ -66,8 +66,7 @@ class DoctorController extends Controller
 
     public function getAppointmentsByDoctorId($doctorId)
     {
-        // Fetch all appointments for a specific doctor along with the session date
-        $appointments = Appointment::select('appointments.*', 'appsessions.session_date as session_date') // Include session date
+        $appointments = Appointment::select('appointments.*', 'appsessions.session_date as session_date') 
             ->join('appsessions', 'appointments.session_id', '=', 'appsessions.id')
             ->where('appsessions.doctor_id', $doctorId)
             ->get();
@@ -75,13 +74,11 @@ class DoctorController extends Controller
         return response()->json($appointments);
     }
     
-    // Method to fetch today's appointments
     public function getTodaysAppointmentsByDoctorId($doctorId)
     {
         $today = now()->format('Y-m-d');
     
-        // Fetch today's appointments along with the session date
-        $appointments = Appointment::select('appointments.*', 'appsessions.session_date as session_date') // Include session date
+        $appointments = Appointment::select('appointments.*', 'appsessions.session_date as session_date') 
             ->join('appsessions', 'appointments.session_id', '=', 'appsessions.id')
             ->where('appsessions.doctor_id', $doctorId)
             ->whereDate('appsessions.session_date', $today) 
@@ -93,40 +90,34 @@ class DoctorController extends Controller
 
     
 
-    // Submit prescription
     public function submitPrescription(Request $request)
     {
-        // Validate the request data
         $request->validate([
-            'appointmentId' => 'required|exists:appointments,id', // Ensure the appointment exists
+            'appointmentId' => 'required|exists:appointments,id', 
             'prescription' => 'required|string',
             'treatment_status' => 'required|integer',
         ]);
 
-        // Find the appointment by ID
         $appointment = Appointment::find($request->appointmentId);
 
-        // Update the appointment with the prescription and treatment status
         $appointment->prescription = $request->prescription;
         $appointment->dr_name = $request->dr_name;
         $appointment->treatment_status = $request->treatment_status;
-        $appointment->save(); // Save the changes to the database
+        $appointment->save(); 
 
         return response()->json(['message' => 'Prescription submitted successfully'], 200);
     }
 
     public function show($id)
     {
-        // Fetch the appointment by ID, along with the related session data
         $appointment = Appointment::with('appsession')->findOrFail($id);
 
-        // Format the response data
         $data = [
             'patient_name' => $appointment->patient_name,
             'phone_number' => $appointment->phone_number,
             'address' => $appointment->address,
             'email' => $appointment->email,
-            'session_date' => optional($appointment->appsession)->session_date, // Assuming 'date' is the column name in the appsession table
+            'session_date' => optional($appointment->appsession)->session_date, 
             'treatment_status' => $appointment->treatment_status,
             'prescription' => $appointment->prescription,
         ];
