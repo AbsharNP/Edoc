@@ -7,10 +7,8 @@
       </div>
     </nav>
 
-    <!-- Registration Form -->
     <div class="register-doctor-container container mt-5">
       <div class="form-card shadow-lg p-4 rounded">
-        <!-- Back Button -->
         <div class="d-flex justify-content-start mb-3">
           <router-link to="/doctor-view" class="btn btn-outline-secondary btn-sm">
             <svg xmlns="http://www.w3.org/2000/svg" 
@@ -142,15 +140,15 @@ export default {
     fetchDepartments() {
   axios.post('/departments')
     .then(response => {
-      console.log('Departments fetched:', response.data); // Check response here
-      this.departments = response.data; // Assuming response.data is the array of departments
+      console.log('Departments fetched:', response.data); 
+      this.departments = response.data; 
     })
     .catch(error => {
       console.error('Error fetching departments:', error);
     });
 },
     registerDoctor() {
-      axios.post('/add-doctor', this.form) // Send the registration data
+      axios.post('/add-doctor', this.form) 
         .then(response => {
           Swal.fire({
             icon: 'success',

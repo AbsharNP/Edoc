@@ -44,8 +44,8 @@
   
           <!-- Sidebar Links -->
           <tr class="menu-row">
-            <td class="menu-btn menu-icon-dashbord" :class="{ 'menu-active': isActive('/admin') }">
-              <router-link to="/admin" class="non-style-link-menu" active-class="non-style-link-menu-active">
+            <td class="menu-btn menu-icon-dashbord" :class="{ 'menu-active': isActive('/doctor-dash') }">
+              <router-link to="/doctor-dash" class="non-style-link-menu" active-class="non-style-link-menu-active">
                 <div class="menu-item">
                   <i class="fas fa-tachometer-alt"></i>
                   <p class="menu-text">Dashboard</p>
@@ -55,7 +55,7 @@
           </tr>
   
           <!-- Doctors Link -->
-          <tr class="menu-row">
+          <!-- <tr class="menu-row">
             <td class="menu-btn menu-icon-doctor" :class="{ 'menu-active': isActive('/doctor-view') }">
               <router-link to="/doctor-view" class="non-style-link-menu" active-class="non-style-link-menu-active">
                 <div class="menu-item">
@@ -64,12 +64,12 @@
                 </div>
               </router-link>
             </td>
-          </tr>
+          </tr> -->
   
           <!-- Schedule Link -->
           <tr class="menu-row">
             <td class="menu-btn menu-icon-schedule" :class="{ 'menu-active': isActive('/schedule') }">
-              <router-link to="/schedule" class="non-style-link-menu" active-class="non-style-link-menu-active">
+              <router-link to="/schedule-sess" class="non-style-link-menu" active-class="non-style-link-menu-active">
                 <div class="menu-item">
                   <i class="fas fa-calendar-alt"></i>
                   <p class="menu-text">Schedule</p>
@@ -92,8 +92,8 @@
   
           <!-- Patients Link -->
           <tr class="menu-row">
-            <td class="menu-btn menu-icon-patient" :class="{ 'menu-active': isActive('/patients') }">
-              <router-link to="/patients" class="non-style-link-menu" active-class="non-style-link-menu-active">
+            <td class="menu-btn menu-icon-patient" :class="{ 'menu-active': isActive('/treatment-completed') }">
+              <router-link to="/treatment-completed" class="non-style-link-menu" active-class="non-style-link-menu-active">
                 <div class="menu-item">
                   <i class="fas fa-procedures"></i>
                   <p class="menu-text">Patients</p>
@@ -139,6 +139,11 @@
           localStorage.removeItem('authToken');
           localStorage.removeItem('userName');
           localStorage.removeItem('userEmail');
+          localStorage.removeItem('isAuthenticated');
+          localStorage.removeItem('userId');
+          localStorage.removeItem('userType');
+          localStorage.removeItem('doctorId');
+  
   
           // Redirect the user to the login page
           this.$router.push({ name: 'login' });

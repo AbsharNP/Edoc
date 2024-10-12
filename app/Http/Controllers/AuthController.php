@@ -12,9 +12,7 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    /**
-     * Handle registration of a new user.
-     */
+    
     public function register(RegisterRequest $request)
     {
         $user = User::create([
@@ -31,17 +29,14 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        // Validate the incoming request
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required|min:6',
         ]);
 
-        // Attempt to log the user in
         if (Auth::attempt($credentials, $request->remember)) {
             $user = Auth::user();
 
-            // Check the user type and return a response
             return response()->json([
                 'message' => 'Login successful',
                 'user' => [
@@ -53,7 +48,6 @@ class AuthController extends Controller
             ]);
         }
 
-        // If the login attempt was unsuccessful, throw a validation exception
         throw ValidationException::withMessages([
             'email' => ['The provided credentials are incorrect.'],
         ]);

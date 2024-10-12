@@ -1,115 +1,72 @@
 <template>
-  <div>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <div class="container">
-        <a class="navbar-brand" href="#">Appointment Registration</a>
-      </div>
-    </nav>
+  <div class="d-flex">
+    <!-- Sidebar -->
+    <div class="sidebar bg-light vh-100 p-0">
+      <PatSidebar />
+    </div>
 
-    <!-- Appointment Form -->
-    <div class="appointment-container container mt-5">
-      <div class="form-card shadow-lg p-4 rounded">
-        <!-- Back Button -->
-        <div class="d-flex justify-content-start mb-3">
-          <router-link to="/doc-list" class="btn btn-outline-secondary btn-sm">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 width="20"
-                 height="20"
-                 viewBox="0 0 24 24"
-                 fill="none"
-                 stroke="currentColor"
-                 stroke-width="2"
-                 stroke-linecap="round"
-                 stroke-linejoin="round"
-                 class="feather feather-arrow-left-circle me-2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <polyline points="12 8 8 12 12 16"></polyline>
-              <line x1="16" y1="12" x2="8" y2="12"></line>
-            </svg>
-            Back
-          </router-link>
-        </div>
+    <!-- Main Content -->
+    <div class="container ">
+      <h2 class="my-4">My Appointments</h2>
 
-        <!-- Form Heading -->
-        <h2 class="text-center mb-4">Book an Appointment</h2>
+      <div v-if="error" class="alert alert-danger">{{ error }}</div>
 
-        <form @submit.prevent="bookAppointment" class="needs-validation" novalidate>
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="patientName" class="form-label">Patient's Name</label>
-              <input
-                type="text"
-                v-model="form.patientName"
-                id="patientName"
-                class="form-control"
-                placeholder="Enter patient's name"
-                required
-              />
-              <div class="invalid-feedback">Please enter a patient's name.</div>
-            </div>
-
-            <div class="col-md-6 mb-3">
-              <label for="sessionAvailable" class="form-label">Session Available</label>
-              <select
-                v-model="form.sessionAvailable"
-                id="sessionAvailable"
-                class="form-select"
-                required
-              >
-                <option value="" disabled>Select session</option>
-                <option v-for="session in sessions" :key="session.id" :value="session.id">
-                  {{ session.time }}
-                </option>
-              </select>
-              <div class="invalid-feedback">Please select a session.</div>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="appointmentDate" class="form-label">Available Date</label>
-              <input
-                type="date"
-                v-model="form.appointmentDate"
-                id="appointmentDate"
-                class="form-control"
-                required
-              />
-              <div class="invalid-feedback">Please select an appointment date.</div>
-            </div>
-          </div>
-
-          <!-- New Fields for Doctor's Name and Department -->
-          <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="doctorName" class="form-label">Doctor's Name</label>
-              <input
-                type="text"
-                v-model="doctorName"
-                id="doctorName"
-                class="form-control"
-                readonly
-              />
-            </div>
-
-            <div class="col-md-6 mb-3">
-              <label for="departmentName" class="form-label">Department</label>
-              <input
-                type="text"
-                v-model="departmentName"
-                id="departmentName"
-                class="form-control"
-                readonly
-              />
-            </div>
-          </div>
-
-          <div class="text-center">
-            <button type="submit" class="btn btn-primary btn-block mt-3">Book Appointment</button>
-          </div>
-        </form>
-      </div>
+      <table class="table table-striped w-100">
+        <thead>
+          <tr>
+            <th>Patient Name</th>
+            <th>Address</th>
+            <th>Ph no:</th>
+            <th>Email</th>
+            <th>Date</th>
+            <th>Dr. Name</th>
+            <th>Status</th>
+            <th>Action</th> <!-- Added Action column -->
+          </tr>
+        </thead>
+          <tbody>
+            <tr v-for="appointment in appointments" :key="appointment.id">
+              <td>{{ capitalizeWords(appointment.patient_name) }}</td>
+              <td>{{ appointment.address }}</td>
+              <td>{{ appointment.phone_number }}</td>
+              <td>{{ appointment.email || 'null' }}</td> <!-- Show 'null' if email is missing -->
+              <td>{{ formatDate(appointment.appsession.session_date) }}</td>
+              <td>{{ capitalizeWords(appointment.appsession.doctor.name) }}</td>
+              <td>{{ appointment.treatment_status ? 'Completed' : 'Pending' }}</td>
+              <td>
+                <router-link 
+                  v-if="appointment.treatment_status === 1" 
+                  :to="`/view-prescriptions`" 
+                  class="btn btn-outline-info"
+                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" 
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                stroke-width="2" stroke-linecap="round" 
+                stroke-linejoin="round" class="feather feather-eye">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z">
+                </path><circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                </router-link>
+                <button 
+                  v-else 
+                  class="btn btn-outline-danger" 
+                  @click="deleteAppointment(appointment.id)"
+                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" 
+                viewBox="0 0 24 24" fill="none" 
+                stroke="currentColor" stroke-width="2" 
+                stroke-linecap="round" stroke-linejoin="round" 
+                class="feather feather-trash">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 
+                2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                </path>
+                </svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+      </table>
     </div>
   </div>
 </template>
@@ -117,153 +74,97 @@
 <script>
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import PatSidebar from '../../../layoutComponents/patientSidebar.vue';
 
 export default {
+  components: {
+    PatSidebar,
+  },
   data() {
     return {
-      form: {
-        patientName: "",
-        sessionAvailable: "",
-        appointmentDate: "",
-      },
-      sessions: [], 
-      doctorName: '',
-      departmentName: '', 
+      appointments: [],
+      error: null,
     };
   },
   mounted() {
-    this.fetchSessions();
-    this.doctorName = this.capitalizeFirstLetter(this.$route.query.doctorName || '');
-    this.departmentName = this.capitalizeFirstLetter(this.$route.query.departmentName || '');
+    this.fetchAppointments();
   },
   methods: {
-    fetchSessions() {
-      axios.get('/sessions')
-        .then(response => {
-          console.log('Sessions fetched:', response.data);
-          this.sessions = response.data;
-        })
-        .catch(error => {
-          console.error('Error fetching sessions:', error);
-        });
-    },
-
-    bookAppointment() {
-      axios.post('/book-appointment', this.form) 
-        .then(response => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Appointment booked successfully',
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 2000,
-            padding: '2em',
-          });
-          this.resetForm(); // Reset the form after successful booking
-          this.$router.push('/patient-dash'); // Redirect to the doctor view page
-        })
-        .catch(error => {
-          console.error('Error booking appointment:', error);
-          Swal.fire({
-            icon: 'error',
-            title: 'Booking failed',
-            text: error.response.data.message || 'An error occurred. Please try again.',
-          });
-        });
-    },
-
-    resetForm() {
-      this.form.patientName = "";
-      this.form.sessionAvailable = "";
-      this.form.appointmentDate = "";
-    },
-
-    // Method to capitalize the first letter of a string
-    capitalizeFirstLetter(string) {
-      return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+    async fetchAppointments() {
+    try {
+      const response = await axios.post('/my-appointments');
+      this.appointments = response.data.sort((a, b) => {
+        const dateA = new Date(a.appsession.session_date);
+        const dateB = new Date(b.appsession.session_date);
+        return dateA - dateB; // Sort in ascending order (oldest first)
+      });
+    } catch (error) {
+      console.error('Error fetching appointments:', error.response?.data || error);
+      this.error = 'Failed to load appointments.';
     }
+  },
+    async deleteAppointment(id) {
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "This action cannot be undone.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!',
+      });
+
+      if (result.isConfirmed) {
+        try {
+          await axios.delete(`/api/appointments/${id}`);
+          this.appointments = this.appointments.filter(appointment => appointment.id !== id);
+          Swal.fire('Deleted!', 'Your appointment has been deleted.', 'success');
+        } catch (error) {
+          console.error('Error deleting appointment:', error.response?.data || error);
+          this.error = 'Failed to delete appointment.';
+          Swal.fire('Error!', 'There was a problem deleting the appointment.', 'error');
+        }
+      }
+    },
+    formatDate(dateString) {
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return new Date(dateString).toLocaleDateString(undefined, options);
+    },
+    capitalizeWords(str) {
+      return str.split(' ').map(word =>
+        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+      ).join(' ');
+    },
   },
 };
 </script>
 
 <style scoped>
-/* Navigation Bar */
-.navbar {
-  margin-bottom: 30px;
-}
 
-/* Main Container */
-.appointment-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding-top: 20px;
-}
 
-/* Form Card */
-.form-card {
-  background-color: #f8f9fa;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  transition: box-shadow 0.3s ease;
-}
-
-/* Card Hover Effect */
-.form-card:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-/* Form Labels */
-.form-label {
-  font-weight: bold;
-  color: #495057;
-}
-
-/* Form Controls */
-.form-control,
-.form-select {
-  border-radius: 6px;
-  transition: border-color 0.3s ease;
-}
-
-/* Focused Input */
-.form-control:focus,
-.form-select:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-}
-
-/* Submit Button */
-.btn-primary {
-  background-color: #007bff;
-  border-color: #007bff;
-  padding: 10px 20px;
-  border-radius: 8px;
+.table {
+  margin-top: 20px;
   width: 100%;
-  transition: background-color 0.3s ease;
 }
 
-/* Hover effect for button */
-.btn-primary:hover {
-  background-color: #0056b3;
-  border-color: #0056b3;
+.table th,
+.table td {
+  text-align: center;
 }
 
-/* Back Button */
-.btn-outline-secondary {
-  font-size: 14px;
+.alert {
+  margin-top: 20px;
 }
 
-/* Responsive Design */
-@media (max-width: 576px) {
-  .appointment-container {
-    padding: 10px;
-  }
+.sidebar {
+  width: 18%;
+}
 
-  .btn-primary {
-    width: auto;
-    display: block;
-    margin: 0 auto;
-  }
+.vh-100 {
+  height: 100vh;
+}
+
+.btn-danger {
+  margin-left: 10px;
 }
 </style>

@@ -8,7 +8,10 @@
     </div>
 
     <!-- Footer -->
-    <footer>App Footer</footer>
+    <footer>
+      <h6 class="text-center">© 2024 Edoc. All rights reserved.</h6>
+      <p class="text-center">Committed to providing exceptional healthcare and patient support.</p>
+    </footer>
   </div>
 </template>
 

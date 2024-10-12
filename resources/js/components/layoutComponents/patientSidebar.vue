@@ -67,7 +67,7 @@
           </tr>
   
           <!-- Schedule Link -->
-          <tr class="menu-row">
+          <!-- <tr class="menu-row">
             <td class="menu-btn menu-icon-schedule" :class="{ 'menu-active': isActive('/schedule') }">
               <router-link to="/schedule" class="non-style-link-menu" active-class="non-style-link-menu-active">
                 <div class="menu-item">
@@ -76,22 +76,22 @@
                 </div>
               </router-link>
             </td>
-          </tr>
+          </tr> -->
   
           <!-- Appointment Link -->
           <tr class="menu-row">
-            <td class="menu-btn menu-icon-appointment" :class="{ 'menu-active': isActive('/appointment') }">
-              <router-link to="/appointment" class="non-style-link-menu" active-class="non-style-link-menu-active">
+            <td class="menu-btn menu-icon-appointment" :class="{ 'menu-active': isActive('/my-appointment') }">
+              <router-link to="/my-appointment" class="non-style-link-menu" active-class="non-style-link-menu-active">
                 <div class="menu-item">
                   <i class="fas fa-calendar-check"></i>
-                  <p class="menu-text">Appointment</p>
+                  <p class="menu-text">My Appointments</p>
                 </div>
               </router-link>
             </td>
           </tr>
   
           <!-- Patients Link -->
-          <tr class="menu-row">
+          <!-- <tr class="menu-row">
             <td class="menu-btn menu-icon-patient" :class="{ 'menu-active': isActive('/patients') }">
               <router-link to="/patients" class="non-style-link-menu" active-class="non-style-link-menu-active">
                 <div class="menu-item">
@@ -100,7 +100,7 @@
                 </div>
               </router-link>
             </td>
-          </tr>
+          </tr> -->
         </table>
       </div>
     </div>
@@ -114,8 +114,8 @@
     data() {
       return {
         isSidebarOpen: true, // Initial state of the sidebar
-        userName: localStorage.getItem('userName') || 'Administrator',
-        userEmail: localStorage.getItem('userEmail') || 'admin@edoc.com',
+        userName: localStorage.getItem('userName') ,
+        userEmail: localStorage.getItem('userEmail') ,
       };
     },
     computed: {
@@ -139,6 +139,9 @@
           localStorage.removeItem('authToken');
           localStorage.removeItem('userName');
           localStorage.removeItem('userEmail');
+          localStorage.removeItem('isAuthenticated');
+          localStorage.removeItem('userId');
+          localStorage.removeItem('userType');
   
           // Redirect the user to the login page
           this.$router.push({ name: 'login' });
